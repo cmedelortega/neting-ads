@@ -1,20 +1,15 @@
-CARPETA DE RESULTADOS REALES DEL DEMO (campaña Fisioterapia)
-============================================================
+RESULTADOS REALES DEL DEMO (campaña Fisioterapia)
+=================================================
 
-Mientras esta carpeta esté vacía, el "Modo Demo" muestra imágenes
-placeholder generadas en código (gradientes con etiqueta "EJEMPLO DEMO").
+Estos archivos son resultados REALES generados con la propia app
+(Imagen 4 + Veo 3.1) y son los que muestra el "Modo Demo":
 
-Para que el demo use TUS resultados reales, genera la campaña en la app
-(modo Servicio → vertical "Salud y Bienestar") y coloca aquí estos archivos
-con EXACTAMENTE estos nombres:
+  en_accion.jpg   -> "En acción" (lleva el video)
+  resultado.jpg   -> "Resultado"
+  equipo.jpg      -> "Equipo / Profesional"
+  testimonio.jpg  -> "Cliente feliz"
+  video.mp4       -> video de Veo 3.1 (se reproduce en la tarjeta "En acción")
 
-  en_accion.jpg     -> tipo de contenido "En acción"
-  resultado.jpg     -> tipo "Resultado"
-  equipo.jpg        -> tipo "Equipo / Profesional"
-  testimonio.jpg    -> tipo "Cliente feliz"
-  video.mp4         -> el video generado con Veo (se reproduce en la tarjeta "En acción")
-
-Luego avísame y actualizo el archivo index.html para que el demo apunte a
-estos archivos en lugar de los placeholders (es un cambio de 4 líneas).
-
-Formato sugerido: imágenes 1:1 (cuadradas), JPG/PNG. Video MP4.
+Para crear otra campaña demo: genera en la app (modo Servicio), descarga
+los archivos y reemplázalos aquí con los mismos nombres, o pide agregar
+una segunda campaña al selector de DEMO_CAMPAIGNS en index.html.
