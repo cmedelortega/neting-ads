@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guía: Cómo obtener tus claves · Neting Ads</title>
+<style>
+  :root{
+    --bg:#0a0a1a; --card:#1a1a2e; --input:#12121f; --border:#2a2a4a;
+    --text:#e2e8f0; --muted:#94a3b8; --dim:#64748b;
+    --purple:#7c3aed; --violet:#8b5cf6; --pink:#ec4899;
+    --grad:linear-gradient(135deg,#7c3aed,#ec4899);
+    --ok:#22c55e; --warn:#f59e0b;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+    background:linear-gradient(135deg,#0a0a1a 0%,#1a0a2e 50%,#0a0a1a 100%);
+    color:var(--text);line-height:1.6;padding:32px 16px;min-height:100vh}
+  .wrap{max-width:760px;margin:0 auto}
+  header{text-align:center;margin-bottom:36px}
+  .logo{font-size:2rem;font-weight:800;background:var(--grad);-webkit-background-clip:text;
+    background-clip:text;-webkit-text-fill-color:transparent}
+  .sub{color:var(--muted);margin-top:6px}
+  .intro{background:var(--card);border:1px solid var(--border);border-radius:14px;
+    padding:20px 22px;margin-bottom:28px;color:var(--muted)}
+  .intro b{color:var(--text)}
+  .keycard{background:var(--card);border:1px solid var(--border);border-radius:16px;
+    padding:26px;margin-bottom:26px;box-shadow:0 4px 24px rgba(0,0,0,.3)}
+  .keytag{display:inline-flex;align-items:center;gap:8px;font-size:.78rem;font-weight:700;
+    text-transform:uppercase;letter-spacing:.5px;padding:5px 12px;border-radius:999px;margin-bottom:14px}
+  .tag-free{background:rgba(34,197,94,.15);color:#4ade80;border:1px solid rgba(34,197,94,.3)}
+  .tag-pro{background:rgba(245,158,11,.15);color:#fbbf24;border:1px solid rgba(245,158,11,.3)}
+  h2{font-size:1.35rem;margin-bottom:4px}
+  .keymeta{color:var(--dim);font-size:.9rem;margin-bottom:18px}
+  .step{display:flex;gap:14px;margin-bottom:16px}
+  .num{flex-shrink:0;width:30px;height:30px;border-radius:50%;background:var(--grad);
+    display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.95rem;color:#fff}
+  .step-body{padding-top:2px}
+  .step-body .t{font-weight:600}
+  .step-body .d{color:var(--muted);font-size:.92rem}
+  .chip{display:inline-block;background:var(--input);border:1px solid var(--border);
+    border-radius:6px;padding:1px 8px;font-size:.85rem;color:var(--violet);font-weight:600}
+  a{color:var(--violet);word-break:break-all}
+  .shot{margin-top:8px;border:1px dashed var(--border);border-radius:10px;background:var(--input);
+    height:120px;display:flex;align-items:center;justify-content:center;color:var(--dim);
+    font-size:.85rem;text-align:center;padding:10px}
+  .callout{display:flex;gap:12px;border-radius:12px;padding:14px 16px;margin-top:18px;font-size:.9rem}
+  .c-tip{background:rgba(124,58,237,.1);border:1px solid rgba(124,58,237,.3)}
+  .c-warn{background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3)}
+  .c-ico{font-size:1.2rem;flex-shrink:0}
+  .final{background:var(--grad);border-radius:16px;padding:26px;text-align:center}
+  .final h2{color:#fff}
+  .final p{color:rgba(255,255,255,.9);margin-top:6px}
+  ul.tips{list-style:none;margin-top:10px}
+  ul.tips li{padding-left:22px;position:relative;color:var(--muted);font-size:.92rem;margin-bottom:6px}
+  ul.tips li:before{content:'•';position:absolute;left:6px;color:var(--violet);font-weight:700}
+  footer{text-align:center;color:var(--dim);font-size:.85rem;margin-top:30px}
+  @media print{body{background:#fff;color:#111}.logo{-webkit-text-fill-color:#7c3aed}
+    .keycard,.intro{border-color:#ddd;box-shadow:none}.shot{border-color:#bbb}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="logo">Neting Ads</div>
+    <div class="sub">Guía rápida: cómo obtener tus 2 claves de Google (10 min)</div>
+  </header>
+
+  <div class="intro">
+    Neting Ads usa la inteligencia artificial de Google para crear tus anuncios. Para que funcione,
+    necesitas pegar <b>dos claves</b> (una sola vez; se guardan en tu navegador, nadie más las ve).
+    Sigue estos pasos con calma — no necesitas saber de programación. 🙌
+  </div>
+
+  <!-- CLAVE 1 -->
+  <div class="keycard">
+    <span class="keytag tag-free">● Gratis</span>
+    <h2>Clave 1 · Gemini (AI Studio)</h2>
+    <div class="keymeta">Sirve para analizar tu servicio y crear imágenes con Nano Banana · ~2 minutos</div>
+
+    <div class="step"><div class="num">1</div><div class="step-body">
+      <div class="t">Abre Google AI Studio</div>
+      <div class="d">Entra a <a href="https://aistudio.google.com/apikey">aistudio.google.com/apikey</a> e inicia sesión con tu cuenta de Google (gmail).</div>
+    </div></div>
+    <div class="step"><div class="num">2</div><div class="step-body">
+      <div class="t">Clic en <span class="chip">Crear clave de API</span></div>
+      <div class="d">El botón aparece arriba a la derecha (“Create API key”).</div>
+    </div></div>
+    <div class="step"><div class="num">3</div><div class="step-body">
+      <div class="t">Elige un proyecto</div>
+      <div class="d">Si no tienes ninguno, selecciona <span class="chip">Crear proyecto nuevo</span>. Acepta y espera unos segundos.</div>
+    </div></div>
+    <div class="step"><div class="num">4</div><div class="step-body">
+      <div class="t">Copia la clave</div>
+      <div class="d">Es un texto largo que empieza con <span class="chip">AIza…</span> Cópiala con el botón de copiar.</div>
+      <div class="shot">📸 (Opcional) Pega aquí tu captura de la pantalla de la clave</div>
+    </div></div>
+    <div class="step"><div class="num">5</div><div class="step-body">
+      <div class="t">Pégala en Neting Ads</div>
+      <div class="d">En la app, campo <span class="chip">Gemini API Key (AI Studio)</span>.</div>
+    </div></div>
+
+    <div class="callout c-tip"><span class="c-ico">💡</span><div>
+      Esta clave tiene una <b>capa gratuita</b> generosa. Con solo esta clave ya puedes analizar tu
+      servicio y generar imágenes con el modelo Nano Banana.</div></div>
+  </div>
+
+  <!-- CLAVE 2 -->
+  <div class="keycard">
+    <span class="keytag tag-pro">● Requiere facturación</span>
+    <h2>Clave 2 · Google Cloud</h2>
+    <div class="keymeta">Necesaria para imágenes Imagen 4 y video con Veo 3.1 · ~5–7 minutos</div>
+
+    <div class="step"><div class="num">1</div><div class="step-body">
+      <div class="t">Abre Google Cloud Console</div>
+      <div class="d">Entra a <a href="https://console.cloud.google.com">console.cloud.google.com</a> con la misma cuenta.</div>
+    </div></div>
+    <div class="step"><div class="num">2</div><div class="step-body">
+      <div class="t">Selecciona (o crea) un proyecto</div>
+      <div class="d">Arriba a la izquierda, junto al logo de Google Cloud.</div>
+    </div></div>
+    <div class="step"><div class="num">3</div><div class="step-body">
+      <div class="t">Habilita <span class="chip">Vertex AI API</span></div>
+      <div class="d">Busca “Vertex AI API” en la barra de búsqueda superior y pulsa <span class="chip">Habilitar</span>.</div>
+    </div></div>
+    <div class="step"><div class="num">4</div><div class="step-body">
+      <div class="t">Activa la facturación (Billing)</div>
+      <div class="d">Menú ☰ → <span class="chip">Facturación</span>. Vincula una tarjeta. Las cuentas nuevas suelen tener <b>créditos gratis</b> de bienvenida.</div>
+    </div></div>
+    <div class="step"><div class="num">5</div><div class="step-body">
+      <div class="t">Crea la clave</div>
+      <div class="d">Menú ☰ → <span class="chip">APIs y servicios</span> → <span class="chip">Credenciales</span> → <span class="chip">Crear credenciales</span> → <span class="chip">Clave de API</span>.</div>
+      <div class="shot">📸 (Opcional) Pega aquí tu captura de la pantalla de Credenciales</div>
+    </div></div>
+    <div class="step"><div class="num">6</div><div class="step-body">
+      <div class="t">Pégala en Neting Ads y guarda</div>
+      <div class="d">Campo <span class="chip">Google Cloud API Key</span> → botón <span class="chip">Guardar Credenciales</span>.</div>
+    </div></div>
+
+    <div class="callout c-warn"><span class="c-ico">⚠️</span><div>
+      La generación de imágenes Imagen 4 y de video <b>consume saldo</b> de tu cuenta de Google según el uso.
+      Empieza con pocas variaciones para controlar el gasto.</div></div>
+  </div>
+
+  <!-- FINAL -->
+  <div class="final">
+    <h2>¡Listo! 🎉</h2>
+    <p>Cuando el indicador de la app diga <b>“Configurado”</b>, ya puedes crear tus anuncios.</p>
+  </div>
+
+  <div class="keycard" style="margin-top:26px">
+    <h2 style="font-size:1.1rem">🔒 Notas importantes</h2>
+    <ul class="tips">
+      <li>Tus claves se guardan <b>solo en tu navegador</b> (no se suben a ningún servidor).</li>
+      <li>No compartas tus claves con nadie. Si se filtran, bórralas/regéneralas desde las mismas páginas.</li>
+      <li>¿Solo quieres imágenes y sin tarjeta? Usa <b>solo la Clave 1</b> y el modelo <b>Nano Banana</b>.</li>
+      <li>Si una imagen no sale bien, usa el botón <b>regenerar</b> o ajusta tu descripción.</li>
+    </ul>
+  </div>
+
+  <footer>Neting Ads · Guía para la comunidad Neting Roma Condesa</footer>
+</div>
+</body>
+</html>
