@@ -117,6 +117,36 @@ body {
   color: var(--text-secondary); border-radius: var(--radius-sm); padding: 4px 12px; cursor: pointer;
 }
 .demo-banner .demo-close:hover { border-color: var(--accent-purple); color: var(--text-primary); }
+.demo-banner .demo-replay {
+  background: transparent; border: 1px solid var(--border-color);
+  color: var(--text-secondary); border-radius: var(--radius-sm); padding: 4px 12px; cursor: pointer;
+}
+.demo-banner .demo-replay:hover { border-color: var(--accent-purple); color: var(--text-primary); }
+
+/* Tour guiado */
+.tour-overlay { position: fixed; inset: 0; z-index: 2000; display: none; }
+.tour-overlay.active { display: block; }
+.tour-ring {
+  position: fixed; z-index: 2001; border-radius: 12px;
+  box-shadow: 0 0 0 9999px rgba(0,0,0,0.78); border: 2px solid var(--accent-violet);
+  pointer-events: none; transition: all 0.3s ease;
+}
+.tour-tip {
+  position: fixed; z-index: 2002; max-width: 340px; width: calc(100vw - 40px);
+  background: var(--bg-card); border: 1px solid var(--border-active);
+  border-radius: 14px; padding: 18px 20px; box-shadow: var(--shadow); color: var(--text-primary);
+}
+.tour-tip h4 { margin-bottom: 6px; font-size: 1.05rem; }
+.tour-tip p { color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 14px; line-height: 1.5; }
+.tour-tip-foot { display: flex; align-items: center; gap: 8px; }
+.tour-step-count { color: var(--text-muted); font-size: 0.8rem; margin-right: auto; }
+.tour-btn {
+  padding: 7px 14px; border-radius: 8px; cursor: pointer; font-size: 0.85rem; font-weight: 600;
+  border: 1px solid var(--border-color); background: transparent; color: var(--text-secondary);
+}
+.tour-btn:hover { color: var(--text-primary); border-color: var(--accent-purple); }
+.tour-btn.primary { background: var(--gradient-primary); color: #fff; border: none; }
+.tour-skip { background: transparent; border: none; color: var(--text-muted); cursor: pointer; font-size: 0.8rem; text-decoration: underline; }
 
 /* Main Layout */
 .main-container { max-width: 1400px; margin: 0 auto; padding: 24px; }
@@ -562,7 +592,23 @@ body {
   <div class="demo-banner" id="demoBanner">
     <span class="demo-tag">MODO DEMO</span>
     <span id="demoBannerText">Estás viendo una campaña de ejemplo con resultados reales pre-generados. No se consumen claves ni saldo.</span>
+    <button class="demo-replay" onclick="startServiceTour()">&#9654; Repetir tour</button>
     <button class="demo-close" onclick="exitDemo()">Salir del demo</button>
+  </div>
+
+  <!-- Tour guiado -->
+  <div class="tour-overlay" id="tourOverlay">
+    <div class="tour-ring" id="tourRing"></div>
+    <div class="tour-tip" id="tourTip">
+      <h4 id="tourTitle"></h4>
+      <p id="tourText"></p>
+      <div class="tour-tip-foot">
+        <span class="tour-step-count" id="tourCount"></span>
+        <button class="tour-skip" id="tourSkip" onclick="endTour()">Saltar</button>
+        <button class="tour-btn" id="tourPrev" onclick="tourPrev()">Atras</button>
+        <button class="tour-btn primary" id="tourNext" onclick="tourNext()">Siguiente</button>
+      </div>
+    </div>
   </div>
 
   <!-- PASO 1 -->
@@ -1191,7 +1237,8 @@ async function loadDemo(idx) {
   document.getElementById('body-gallery').classList.remove('collapsed');
   renderGallery();
   document.getElementById('body-gallery').scrollIntoView({ behavior: 'smooth', block: 'start' });
-  showToast('Demo cargada: explora la galeria, marca favoritos y abre el video', 'success');
+  showToast('Demo cargada: te muestro como funciona', 'success');
+  setTimeout(startServiceTour, 500);
 }
 
 function exitDemo() {
@@ -1200,8 +1247,76 @@ function exitDemo() {
   state.generatedContent = [];
   state.currentCampaign.productAnalysis = null;
   document.getElementById('analysisPanel').style.display = 'none';
+  endTour();
   renderGallery();
   showToast('Saliste del modo demo', 'info');
+}
+
+// ===== TOUR GUIADO =====
+let TOUR_STEPS = [], tourIdx = 0;
+
+function startServiceTour() {
+  TOUR_STEPS = [
+    { center: true, title: '\u{1F44B} Bienvenido al demo', text: 'En unos pasos te muestro como Neting Ads convierte la descripcion de un servicio en anuncios listos (imagenes y video). Sin claves ni costo.' },
+    { sel: '#descriptionInput', title: '1. Describe tu servicio', text: 'Escribes que ofreces (o eliges tu profesion) y la plataforma. En este demo: una fisioterapia a domicilio.' },
+    { sel: '#analysisPanel', title: '2. La IA lo analiza', text: 'Google Gemini entiende tu servicio: propuesta de valor, publico objetivo y el escenario ideal para los anuncios.' },
+    { sel: '#serviceContentTypes', title: '3. Eliges los anuncios', text: 'Seleccionas que piezas crear: en accion, resultado, equipo, cliente feliz, ambiente, promesa de marca...' },
+    { sel: '#galleryGrid .content-card:first-child', title: '4. Genera los anuncios', text: 'En segundos obtienes anuncios fotorrealistas. Haz clic en una imagen para ampliarla.' },
+    { sel: '#galleryGrid .content-card:first-child [title="Video"]', title: '5. Crea video con IA', text: 'Desde cualquier imagen generas un video con Veo 3.1. Tambien apruebas, marcas favoritos y exportas todo en ZIP.' }
+  ];
+  tourIdx = 0;
+  document.getElementById('tourOverlay').classList.add('active');
+  showTourStep();
+  window.addEventListener('resize', positionTour);
+  window.addEventListener('scroll', positionTour, true);
+}
+
+function showTourStep() {
+  const s = TOUR_STEPS[tourIdx];
+  document.getElementById('tourTitle').textContent = s.title;
+  document.getElementById('tourText').textContent = s.text;
+  document.getElementById('tourCount').textContent = `Paso ${tourIdx + 1} de ${TOUR_STEPS.length}`;
+  document.getElementById('tourPrev').style.display = tourIdx === 0 ? 'none' : 'inline-block';
+  document.getElementById('tourNext').textContent = tourIdx === TOUR_STEPS.length - 1 ? 'Finalizar' : 'Siguiente';
+  const el = s.sel ? document.querySelector(s.sel) : null;
+  if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); setTimeout(positionTour, 350); }
+  else { positionTour(); }
+}
+
+function positionTour() {
+  if (!document.getElementById('tourOverlay').classList.contains('active')) return;
+  const s = TOUR_STEPS[tourIdx];
+  const ring = document.getElementById('tourRing');
+  const tip = document.getElementById('tourTip');
+  const el = s && s.sel ? document.querySelector(s.sel) : null;
+  if (!el) {
+    ring.style.width = '0px'; ring.style.height = '0px';
+    ring.style.left = '50%'; ring.style.top = '50%';
+    tip.style.left = '50%'; tip.style.top = '50%'; tip.style.transform = 'translate(-50%,-50%)';
+    return;
+  }
+  const r = el.getBoundingClientRect();
+  const pad = 8;
+  ring.style.width = (r.width + pad * 2) + 'px';
+  ring.style.height = (r.height + pad * 2) + 'px';
+  ring.style.left = (r.left - pad) + 'px';
+  ring.style.top = (r.top - pad) + 'px';
+  tip.style.transform = 'none';
+  const tipH = tip.offsetHeight || 170;
+  const tipW = tip.offsetWidth || 320;
+  let top = r.bottom + 14;
+  if (top + tipH > window.innerHeight - 10) top = Math.max(10, r.top - tipH - 14);
+  let left = Math.min(Math.max(10, r.left), window.innerWidth - tipW - 10);
+  tip.style.left = left + 'px';
+  tip.style.top = top + 'px';
+}
+
+function tourNext() { if (tourIdx < TOUR_STEPS.length - 1) { tourIdx++; showTourStep(); } else endTour(); }
+function tourPrev() { if (tourIdx > 0) { tourIdx--; showTourStep(); } }
+function endTour() {
+  document.getElementById('tourOverlay').classList.remove('active');
+  window.removeEventListener('resize', positionTour);
+  window.removeEventListener('scroll', positionTour, true);
 }
 
 // ===== UPLOAD =====
