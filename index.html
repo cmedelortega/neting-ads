@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Neting Ads · Anuncios con IA para tu servicio</title>
+<title>Neting Ads · Anuncios con IA para producto o servicio</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <style>
 :root {
@@ -122,6 +122,10 @@ body {
   color: var(--text-secondary); border-radius: var(--radius-sm); padding: 4px 12px; cursor: pointer;
 }
 .demo-banner .demo-replay:hover { border-color: var(--accent-purple); color: var(--text-primary); }
+.demo-switch { display: inline-flex; gap: 4px; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 3px; }
+.demo-seg { background: transparent; border: none; color: var(--text-secondary); border-radius: 6px; padding: 4px 10px; cursor: pointer; font-size: 0.82rem; font-weight: 600; }
+.demo-seg:hover { color: var(--text-primary); }
+.demo-seg.active { background: var(--gradient-primary); color: #fff; }
 
 /* Tour guiado */
 .tour-overlay { position: fixed; inset: 0; z-index: 2000; display: none; }
@@ -566,7 +570,7 @@ body {
   <div class="header-left">
     <div>
       <div class="header-logo">Neting Ads</div>
-      <div class="header-subtitle">Anuncios profesionales con IA para tu servicio</div>
+      <div class="header-subtitle">Anuncios profesionales con IA para tu producto o servicio</div>
     </div>
   </div>
   <div class="header-right">
@@ -595,6 +599,10 @@ body {
   <div class="demo-banner" id="demoBanner">
     <span class="demo-tag">MODO DEMO</span>
     <span id="demoBannerText">Estás viendo una campaña de ejemplo con resultados reales pre-generados. No se consumen claves ni saldo.</span>
+    <span class="demo-switch">
+      <button class="demo-seg active" id="demoSeg-0" onclick="loadDemo(0)">&#129309; Servicio</button>
+      <button class="demo-seg" id="demoSeg-1" onclick="loadDemo(1)">&#128230; Producto</button>
+    </span>
     <button class="demo-replay" onclick="startServiceTour()">&#9654; Repetir tour</button>
     <button class="demo-close" onclick="exitDemo()">Salir del demo</button>
   </div>
@@ -932,6 +940,7 @@ body {
 const state = {
   mode: 'servicio',
   demoMode: false,
+  demoIndex: 0,
   aiStudioKey: localStorage.getItem('cce_aiStudioKey') || '',
   cloudKey: localStorage.getItem('cce_cloudKey') || '',
   currentCampaign: {
@@ -965,8 +974,10 @@ document.addEventListener('DOMContentLoaded', () => {
   setMode('servicio');
   // Auto-arranque del demo desde un enlace de portafolio: ...?demo=1 o #demo
   const params = new URLSearchParams(location.search);
-  if (params.get('demo') === '1' || location.hash === '#demo') {
-    setTimeout(() => loadDemo(0), 300);
+  const demoParam = params.get('demo');
+  if (demoParam || location.hash === '#demo') {
+    const idx = (demoParam === 'producto' || demoParam === '2') ? 1 : 0;
+    setTimeout(() => loadDemo(idx), 300);
   }
 });
 
@@ -1169,6 +1180,7 @@ function demoImg(label, emoji, c1, c2) {
 }
 
 const DEMO_CAMPAIGNS = [{
+  mode: 'servicio',
   campaignName: 'Fisioterapia Roma · Recuperacion deportiva',
   vertical: 'salud',
   platform: 'Instagram (1:1)',
@@ -1187,36 +1199,72 @@ const DEMO_CAMPAIGNS = [{
     { contentType: 'equipo', images: ['demo/fisio/equipo.jpg'], description: 'Retrato del fisioterapeuta, cercano y experto, en su consultorio.' },
     { contentType: 'testimonio', images: ['demo/fisio/testimonio.jpg'], description: 'Clienta relajada y sin dolor en casa despues de su sesion de fisioterapia.' }
   ]
+}, {
+  mode: 'producto',
+  campaignName: 'Glow Serum · Skincare premium',
+  template: 'belleza',
+  platform: 'Instagram (1:1)',
+  model: 'imagen-4.0-generate-001',
+  description: 'Serum facial premium en frasco gotero esmerilado con tapa de madera. Estilo elegante y natural, sensacion de lujo y bienestar. Publico: cuidado de la piel 25-45.',
+  analysis: {
+    productType: 'Serum facial premium (skincare)',
+    brandName: 'Glow',
+    shortDescription: 'Serum facial premium en frasco gotero esmerilado con tapa de madera, estetica limpia y de lujo.',
+    keyFeatures: ['Frasco gotero esmerilado', 'Tapa de madera nat', 'Estetica minimal premium'],
+    suggestedEnvironments: ['Marmol', 'Bano luminoso', 'Fondo beige editorial']
+  },
+  items: [
+    { contentType: 'product_shot', images: ['demo/producto/product_shot.jpg'], description: 'Toma de producto sobre marmol con iluminacion de estudio, estetica de lujo minimalista.', favorite: true, status: 'approved' },
+    { contentType: 'ugc_lifestyle', images: ['demo/producto/ugc_lifestyle.jpg'], description: 'Creadora mostrando el serum en el bano, estilo UGC autentico, piel luminosa.', status: 'approved' },
+    { contentType: 'flat_lay', images: ['demo/producto/flat_lay.jpg'], description: 'Flat lay editorial con eucalipto, toalla y piedras sobre fondo beige.' },
+    { contentType: 'unboxing', images: ['demo/producto/unboxing.jpg'], description: 'Momento de unboxing: manos abriendo la caja premium con el serum entre papel.' }
+  ]
 }];
 
 async function loadDemo(idx) {
   const c = DEMO_CAMPAIGNS[idx];
   if (!c) return;
-  setMode('servicio');
-  const vsel = document.getElementById('serviceTemplateSelect');
-  vsel.value = c.vertical;
-  applyServiceTemplate();
+  endTour();
+  state.demoIndex = idx;
+  const isService = c.mode !== 'producto';
+  setMode(c.mode || 'servicio');
+
+  if (isService) {
+    const vsel = document.getElementById('serviceTemplateSelect');
+    vsel.value = c.vertical;
+    applyServiceTemplate();
+  } else {
+    document.getElementById('templateSelect').value = c.template || '';
+    if (c.model) document.getElementById('imageModelSelect').value = c.model;
+    if (c.description) document.getElementById('descriptionInput').value = c.description;
+  }
   if (c.description) document.getElementById('descriptionInput').value = c.description;
   document.getElementById('campaignName').value = c.campaignName;
   document.getElementById('platformSelect').value = c.platform;
 
+  // Seleccionar los tipos de contenido de la campana en el grid visible
+  const gridId = isService ? 'serviceContentTypes' : 'productContentTypes';
+  const types = c.items.map(it => it.contentType);
+  document.querySelectorAll('#' + gridId + ' .content-type-btn').forEach(btn => {
+    btn.classList.toggle('active', types.includes(btn.dataset.type));
+  });
+
   state.demoMode = true;
   document.getElementById('demoBanner').classList.add('active');
+  updateDemoSelector(idx);
 
   // Animacion de "generacion" para mostrar el flujo real
-  showProgress('Generando contenido...', 'Analizando servicio...');
+  showProgress('Generando contenido...', isService ? 'Analizando servicio...' : 'Analizando producto...');
+  const tipoLabels = c.items.map(it => contentTypeLabels[it.contentType] || it.contentType);
   const steps = [
-    'Analizando servicio con Gemini...',
+    isService ? 'Analizando servicio con Gemini...' : 'Analizando producto con Gemini...',
     'Generando prompts creativos...',
-    'Generando En accion...',
-    'Generando Resultado...',
-    'Generando Equipo...',
-    'Generando Cliente feliz...',
-    'Renderizando video con Veo 3.1...'
+    ...tipoLabels.map(t => 'Generando ' + t + '...')
   ];
+  if (c.items.some(it => it.video)) steps.push('Renderizando video con Veo 3.1...');
   for (let i = 0; i < steps.length; i++) {
     updateProgress(i + 1, steps.length, steps[i]);
-    await new Promise(r => setTimeout(r, 430));
+    await new Promise(r => setTimeout(r, 380));
   }
   hideProgress();
 
@@ -1264,12 +1312,21 @@ function exitDemo() {
 let TOUR_STEPS = [], tourIdx = 0;
 
 function startServiceTour() {
-  TOUR_STEPS = [
-    { center: true, title: '\u{1F44B} Bienvenido al demo', text: 'En unos pasos te muestro como Neting Ads convierte la descripcion de un servicio en anuncios listos (imagenes y video). Sin claves ni costo.' },
+  const isService = state.mode !== 'producto';
+  const ctSel = isService ? '#serviceContentTypes' : '#productContentTypes';
+  TOUR_STEPS = isService ? [
+    { center: true, title: '\u{1F44B} Bienvenido al demo', text: 'En unos pasos te muestro como Neting Ads convierte la descripcion de un servicio en anuncios listos (imagenes y video). Sin claves ni costo. (Tambien funciona para productos / e-commerce: prueba el boton Producto del banner.)' },
     { sel: '#descriptionInput', title: '1. Describe tu servicio', text: 'Escribes que ofreces (o eliges tu profesion) y la plataforma. En este demo: una fisioterapia a domicilio.' },
     { sel: '#analysisPanel', title: '2. La IA lo analiza', text: 'Google Gemini entiende tu servicio: propuesta de valor, publico objetivo y el escenario ideal para los anuncios.' },
-    { sel: '#serviceContentTypes', title: '3. Eliges los anuncios', text: 'Seleccionas que piezas crear: en accion, resultado, equipo, cliente feliz, ambiente, promesa de marca...' },
+    { sel: ctSel, title: '3. Eliges los anuncios', text: 'Seleccionas que piezas crear: en accion, resultado, equipo, cliente feliz, ambiente, promesa de marca...' },
     { sel: '#galleryGrid .content-card:first-child', title: '4. Genera los anuncios', text: 'En segundos obtienes anuncios fotorrealistas. Haz clic en una imagen para ampliarla.' },
+    { sel: '#galleryGrid .content-card:first-child [title="Video"]', title: '5. Crea video con IA', text: 'Desde cualquier imagen generas un video con Veo 3.1. Tambien apruebas, marcas favoritos y exportas todo en ZIP.' }
+  ] : [
+    { center: true, title: '\u{1F44B} Demo e-commerce', text: 'Ahora en modo Producto: Neting Ads convierte la foto de un producto en un set de anuncios para tienda online. Sin claves ni costo.' },
+    { sel: '#uploadArea', title: '1. Sube tu producto', text: 'Subes una foto de tu producto y describes el estilo. En este demo: un serum de skincare premium.' },
+    { sel: '#analysisPanel', title: '2. La IA lo analiza', text: 'Gemini analiza el producto (forma, color, material) para que los anuncios lo respeten con fidelidad.' },
+    { sel: ctSel, title: '3. Eliges los formatos', text: 'Seleccionas que piezas crear: product shot, lifestyle/UGC, flat lay, unboxing...' },
+    { sel: '#galleryGrid .content-card:first-child', title: '4. Genera los anuncios', text: 'En segundos obtienes fotos de producto profesionales. Haz clic en una imagen para ampliarla.' },
     { sel: '#galleryGrid .content-card:first-child [title="Video"]', title: '5. Crea video con IA', text: 'Desde cualquier imagen generas un video con Veo 3.1. Tambien apruebas, marcas favoritos y exportas todo en ZIP.' }
   ];
   tourIdx = 0;
@@ -1277,6 +1334,12 @@ function startServiceTour() {
   showTourStep();
   window.addEventListener('resize', positionTour);
   window.addEventListener('scroll', positionTour, true);
+}
+
+function updateDemoSelector(idx) {
+  const s0 = document.getElementById('demoSeg-0'), s1 = document.getElementById('demoSeg-1');
+  if (s0) s0.classList.toggle('active', idx === 0);
+  if (s1) s1.classList.toggle('active', idx === 1);
 }
 
 function showTourStep() {
