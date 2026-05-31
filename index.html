@@ -94,6 +94,29 @@ body {
   transition: all 0.3s;
 }
 .btn-history:hover { border-color: var(--accent-purple); background: var(--bg-card-hover); }
+.btn-demo {
+  background: var(--gradient-primary); border: none; color: #fff;
+  padding: 8px 16px; border-radius: var(--radius-sm); cursor: pointer;
+  font-size: 0.85rem; font-weight: 700; transition: all 0.3s;
+  box-shadow: 0 4px 16px rgba(124,58,237,0.35);
+}
+.btn-demo:hover { transform: translateY(-1px); box-shadow: 0 6px 22px rgba(236,72,153,0.45); }
+.demo-banner {
+  display: none; align-items: center; gap: 12px;
+  background: linear-gradient(135deg, rgba(124,58,237,0.18), rgba(236,72,153,0.18));
+  border: 1px solid var(--border-active); border-radius: var(--radius);
+  padding: 12px 18px; margin-bottom: 18px; color: var(--text-primary); font-size: 0.9rem;
+}
+.demo-banner.active { display: flex; }
+.demo-banner .demo-tag {
+  background: var(--gradient-primary); color: #fff; font-weight: 700; font-size: 0.72rem;
+  letter-spacing: 0.5px; padding: 3px 10px; border-radius: 999px; flex-shrink: 0;
+}
+.demo-banner .demo-close {
+  margin-left: auto; background: transparent; border: 1px solid var(--border-color);
+  color: var(--text-secondary); border-radius: var(--radius-sm); padding: 4px 12px; cursor: pointer;
+}
+.demo-banner .demo-close:hover { border-color: var(--accent-purple); color: var(--text-primary); }
 
 /* Main Layout */
 .main-container { max-width: 1400px; margin: 0 auto; padding: 24px; }
@@ -518,6 +541,7 @@ body {
       <span class="status-dot"></span>
       <span id="statusText">Sin configurar</span>
     </div>
+    <button class="btn-demo" onclick="loadDemo(0)">&#9654; Ver demo</button>
     <button class="btn-history" onclick="toggleSidebar()">&#9776; Historial</button>
   </div>
 </header>
@@ -534,6 +558,12 @@ body {
 
 <!-- Main -->
 <div class="main-container">
+
+  <div class="demo-banner" id="demoBanner">
+    <span class="demo-tag">MODO DEMO</span>
+    <span id="demoBannerText">Estás viendo una campaña de ejemplo con resultados reales pre-generados. No se consumen claves ni saldo.</span>
+    <button class="demo-close" onclick="exitDemo()">Salir del demo</button>
+  </div>
 
   <!-- PASO 1 -->
   <div class="section">
@@ -852,6 +882,7 @@ body {
 // ===== STATE =====
 const state = {
   mode: 'servicio',
+  demoMode: false,
   aiStudioKey: localStorage.getItem('cce_aiStudioKey') || '',
   cloudKey: localStorage.getItem('cce_cloudKey') || '',
   currentCampaign: {
@@ -1066,6 +1097,111 @@ Responde SOLO con un objeto JSON (sin markdown, sin code fences):
     `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${state.aiStudioKey}`,
     { contents: [{ parts }], generationConfig: { responseMimeType: 'application/json' } }
   );
+}
+
+// ===== MODO DEMO (sin claves, resultados de ejemplo) =====
+// Genera un placeholder SVG visual. Al integrar resultados reales,
+// se reemplaza el valor de "images" por la ruta del archivo (ej: 'demo/fisio/en_accion.jpg').
+function demoImg(label, emoji, c1, c2) {
+  const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='600' height='600'>`
+    + `<defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'>`
+    + `<stop offset='0' stop-color='${c1}'/><stop offset='1' stop-color='${c2}'/></linearGradient></defs>`
+    + `<rect width='600' height='600' fill='url(#g)'/>`
+    + `<text x='300' y='275' font-size='130' text-anchor='middle'>${emoji}</text>`
+    + `<text x='300' y='355' font-family='Arial,sans-serif' font-size='36' fill='white' text-anchor='middle' font-weight='bold'>${label}</text>`
+    + `<text x='300' y='400' font-family='Arial,sans-serif' font-size='22' fill='rgba(255,255,255,0.75)' text-anchor='middle'>EJEMPLO DEMO</text>`
+    + `</svg>`;
+  return 'data:image/svg+xml,' + encodeURIComponent(svg);
+}
+
+const DEMO_CAMPAIGNS = [{
+  campaignName: 'Fisioterapia Roma · Recuperacion deportiva',
+  vertical: 'salud',
+  platform: 'Instagram (1:1)',
+  model: 'gemini-2.5-flash-image',
+  description: 'Fisioterapia deportiva a domicilio en Roma-Condesa. Recuperacion de lesiones con trato cercano y profesional. Publico: adultos activos 25-55.',
+  analysis: {
+    serviceType: 'Fisioterapia deportiva a domicilio',
+    valueProposition: 'Recuperate de tu lesion sin salir de casa',
+    targetAudience: 'Adultos activos 25-55 anos',
+    emotionalBenefit: 'Confianza, alivio y volver a moverte sin dolor',
+    shortDescription: 'Fisioterapia deportiva a domicilio con trato cercano y resultados reales.'
+  },
+  items: [
+    { contentType: 'en_accion', images: [demoImg('En accion', '\u{1F938}', '#7c3aed', '#ec4899')], description: 'Fisioterapeuta aplicando terapia manual a un paciente en un espacio luminoso y profesional.', favorite: true, status: 'approved', video: 'demo/fisio/video.mp4' },
+    { contentType: 'resultado', images: [demoImg('Resultado', '✨', '#6366f1', '#8b5cf6')], description: 'Paciente recuperado corriendo al aire libre, sonriente y sin dolor.', status: 'approved' },
+    { contentType: 'equipo', images: [demoImg('Equipo / Pro', '\u{1F9D1}‍⚕️', '#0ea5e9', '#7c3aed')], description: 'Retrato del fisioterapeuta, cercano y experto, en su consultorio.' },
+    { contentType: 'testimonio', images: [demoImg('Cliente feliz', '\u{1F60A}', '#ec4899', '#f59e0b')], description: 'Clienta feliz estirando despues de su sesion, ambiente calido.' }
+  ]
+}];
+
+async function loadDemo(idx) {
+  const c = DEMO_CAMPAIGNS[idx];
+  if (!c) return;
+  setMode('servicio');
+  const vsel = document.getElementById('serviceTemplateSelect');
+  vsel.value = c.vertical;
+  applyServiceTemplate();
+  if (c.description) document.getElementById('descriptionInput').value = c.description;
+  document.getElementById('campaignName').value = c.campaignName;
+  document.getElementById('platformSelect').value = c.platform;
+
+  state.demoMode = true;
+  document.getElementById('demoBanner').classList.add('active');
+
+  // Animacion de "generacion" para mostrar el flujo real
+  showProgress('Generando contenido...', 'Analizando servicio...');
+  const steps = [
+    'Analizando servicio con Gemini...',
+    'Generando prompts creativos...',
+    'Generando En accion...',
+    'Generando Resultado...',
+    'Generando Equipo...',
+    'Generando Cliente feliz...',
+    'Renderizando video con Veo 3.1...'
+  ];
+  for (let i = 0; i < steps.length; i++) {
+    updateProgress(i + 1, steps.length, steps[i]);
+    await new Promise(r => setTimeout(r, 430));
+  }
+  hideProgress();
+
+  // Cargar resultados de ejemplo en la galeria (mismo formato que una corrida real)
+  state.generatedContent = c.items.map((it, i) => ({
+    id: 'demo_' + idx + '_' + i,
+    campaignName: c.campaignName,
+    contentType: it.contentType,
+    images: it.images,
+    prompt: it.description,
+    description: it.description,
+    model: c.model,
+    platform: c.platform,
+    status: it.status || 'review',
+    favorite: !!it.favorite,
+    hasVideo: !!it.video,
+    videoUrl: it.video || null,
+    createdAt: '2026-01-01T00:00:00.000Z'
+  }));
+  state.currentCampaign.productAnalysis = c.analysis || null;
+  if (c.analysis) {
+    document.getElementById('analysisPanel').style.display = 'block';
+    document.getElementById('analysisContent').innerHTML = formatProductAnalysis(c.analysis);
+  }
+  state.currentFilter = 'all';
+  document.getElementById('body-gallery').classList.remove('collapsed');
+  renderGallery();
+  document.getElementById('body-gallery').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  showToast('Demo cargada: explora la galeria, marca favoritos y abre el video', 'success');
+}
+
+function exitDemo() {
+  state.demoMode = false;
+  document.getElementById('demoBanner').classList.remove('active');
+  state.generatedContent = [];
+  state.currentCampaign.productAnalysis = null;
+  document.getElementById('analysisPanel').style.display = 'none';
+  renderGallery();
+  showToast('Saliste del modo demo', 'info');
 }
 
 // ===== UPLOAD =====
@@ -1955,11 +2091,18 @@ function openVideoModal(idx) {
   state.videoTargetIndex = idx;
   document.getElementById('videoModal').classList.add('active');
   document.getElementById('videoPromptContainer').style.display = 'none';
-  document.getElementById('videoPreviewContainer').style.display = 'none';
   document.getElementById('videoStatus').style.display = 'none';
   document.getElementById('videoDialog').value = '';
   document.getElementById('videoCameraInstructions').value = '';
   document.getElementById('videoPromptText').value = '';
+  // Si el item ya tiene video (demo o ya generado), reproducirlo al instante
+  const item = state.generatedContent[idx];
+  if (item && item.videoUrl) {
+    document.getElementById('videoPreview').src = item.videoUrl;
+    document.getElementById('videoPreviewContainer').style.display = 'block';
+  } else {
+    document.getElementById('videoPreviewContainer').style.display = 'none';
+  }
 }
 
 function openVideoFromImageModal() {
@@ -1987,13 +2130,14 @@ async function generateVideoPrompt() {
     ? item.description
     : (state.currentCampaign.productAnalysis ? state.currentCampaign.productAnalysis.shortDescription : 'el producto');
 
-  const sysPrompt = `Generate a short, vivid video generation prompt for an advertising video.
-Product: ${productDesc}
+  const sysPrompt = `Generate a short, vivid video generation prompt for an advertising video for Veo 3.1.
+Subject: ${productDesc}
 Format: ${format}, Duration: ${duration}s
-${dialog ? 'Dialog/Audio: ' + dialog : ''}
 ${camera ? 'Camera: ' + camera : ''}
 
-Write a single detailed prompt paragraph for the video. Be specific about camera movement, lighting, and mood. Write in English. Only output the prompt text, nothing else.`;
+Write ONE detailed paragraph describing camera movement, lighting and mood. Write the visual description in English.
+${dialog ? `CRITICAL — this video MUST have spoken audio. Finish the prompt with an explicit audio direction that includes the spoken line VERBATIM (do not translate or paraphrase it), formatted exactly like:\nAudio: a professional advertising voiceover says: "${dialog}". Natural pacing, clear diction, subtle background music.` : ''}
+Only output the prompt text, nothing else.`;
 
   try {
     const res = await fetch(
@@ -2005,7 +2149,12 @@ Write a single detailed prompt paragraph for the video. Be specific about camera
       }
     );
     const data = await res.json();
-    const text = extractTextFromResponse(data);
+    let text = extractTextFromResponse(data);
+    // Garantia: si hay dialogo y el modelo no lo conservo textual, lo anexamos nosotros.
+    // Veo 3.1 solo genera voz si las palabras habladas estan EXPLICITAS en el prompt.
+    if (dialog && !text.includes(dialog)) {
+      text += `\n\nAudio: a clear professional advertising voiceover says: "${dialog}". Spoken narration with natural pacing and clear diction; subtle background music; no on-screen text.`;
+    }
     document.getElementById('videoPromptText').value = text;
     document.getElementById('videoPromptContainer').style.display = 'block';
   } catch (e) {
@@ -2016,9 +2165,17 @@ Write a single detailed prompt paragraph for the video. Be specific about camera
 async function generateVideo() {
   if (!state.aiStudioKey) { showToast('Configura la clave AI Studio', 'error'); return; }
 
-  const prompt = document.getElementById('videoPromptText').value.trim();
+  let prompt = document.getElementById('videoPromptText').value.trim();
   if (!prompt) {
     showToast('Primero genera o escribe un prompt para el video', 'error'); return;
+  }
+
+  // Blindaje de audio: si hay dialogo escrito y no esta en el prompt, lo anexamos.
+  // (Veo 3.1 solo habla si las palabras estan explicitas en el prompt enviado.)
+  const dialogText = document.getElementById('videoDialog').value.trim();
+  if (dialogText && !prompt.includes(dialogText)) {
+    prompt += `\n\nAudio: a clear professional advertising voiceover says: "${dialogText}". Spoken narration with natural pacing and clear diction; subtle background music; no on-screen text.`;
+    document.getElementById('videoPromptText').value = prompt;
   }
 
   const format = document.getElementById('videoFormat').value;
