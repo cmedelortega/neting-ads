@@ -963,6 +963,11 @@ document.addEventListener('DOMContentLoaded', () => {
   renderCampaignHistory();
   setupDragDrop();
   setMode('servicio');
+  // Auto-arranque del demo desde un enlace de portafolio: ...?demo=1 o #demo
+  const params = new URLSearchParams(location.search);
+  if (params.get('demo') === '1' || location.hash === '#demo') {
+    setTimeout(() => loadDemo(0), 300);
+  }
 });
 
 // ===== CREDENTIALS =====
